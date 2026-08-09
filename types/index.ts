@@ -25,6 +25,8 @@ export type GeneratedSite = {
   heroStyle?: HeroStyle;
   contentStyle?: ContentStyle;
   buttonStyle?: ButtonStyle;
+  seoTitle?: string;
+  seoDescription?: string;
   sections: Array<{
     id: string;
     title: string;

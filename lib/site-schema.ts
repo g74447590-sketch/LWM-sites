@@ -20,6 +20,8 @@ export const generatedSiteSchema = z.object({
   heroStyle: z.enum(["gradient", "solid", "split"]).optional(),
   contentStyle: z.enum(["cards", "minimal", "outlined"]).optional(),
   buttonStyle: z.enum(["rounded", "square", "pill"]).optional(),
+  seoTitle: z.string().trim().min(1).max(60).optional(),
+  seoDescription: z.string().trim().min(1).max(160).optional(),
   sections: z
     .array(
       z.object({

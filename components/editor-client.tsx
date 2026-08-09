@@ -7,7 +7,7 @@ import type { ButtonStyle, ContentStyle, GeneratedSite, HeroStyle, Project, Sect
 
 type Device = "desktop" | "tablet" | "mobile";
 type EditorPanel = "content" | "blocks" | "design";
-type TextField = "businessName" | "tagline" | "heroTitle" | "heroBody" | "ctaLabel" | "ctaHref" | "primaryColor" | "accentColor";
+type TextField = "businessName" | "tagline" | "heroTitle" | "heroBody" | "ctaLabel" | "ctaHref" | "primaryColor" | "accentColor" | "seoTitle" | "seoDescription";
 type DesignField = "fontFamily" | "heroStyle" | "contentStyle" | "buttonStyle";
 type SiteSection = GeneratedSite["sections"][number];
 
@@ -284,6 +284,7 @@ export function EditorClient({ project }: { project: Project }) {
           <section className="editor-group"><h2>Estilo da capa</h2><div className="style-options" role="group" aria-label="Estilo da capa">{([ ["gradient", "Gradiente"], ["solid", "Sólida"], ["split", "Destaque"] ] as const).map(([value, label]) => <button key={value} type="button" className={site.heroStyle === value || (!site.heroStyle && value === "gradient") ? "active" : ""} onClick={() => updateDesign("heroStyle", value)}>{label}</button>)}</div></section>
           <section className="editor-group"><h2>Cartões</h2><div className="style-options" role="group" aria-label="Estilo dos cartões">{([ ["cards", "Cartões"], ["minimal", "Minimalista"], ["outlined", "Contorno"] ] as const).map(([value, label]) => <button key={value} type="button" className={site.contentStyle === value || (!site.contentStyle && value === "cards") ? "active" : ""} onClick={() => updateDesign("contentStyle", value)}>{label}</button>)}</div></section>
           <section className="editor-group"><h2>Botão</h2><div className="style-options" role="group" aria-label="Formato do botão">{([ ["rounded", "Arredondado"], ["square", "Reto"], ["pill", "Pílula"] ] as const).map(([value, label]) => <button key={value} type="button" className={site.buttonStyle === value || (!site.buttonStyle && value === "rounded") ? "active" : ""} onClick={() => updateDesign("buttonStyle", value)}>{label}</button>)}</div></section>
+          <section className="editor-group"><h2>SEO e compartilhamento</h2><p className="editor-helper">Título e descrição usados pelo Google e ao compartilhar o link.</p><label>Título SEO <small>(até 60 caracteres)</small><input value={site.seoTitle ?? ""} maxLength={60} placeholder={site.businessName} onChange={(event) => updateSite("seoTitle", event.target.value)} /></label><label>Descrição SEO <small>(até 160 caracteres)</small><textarea value={site.seoDescription ?? ""} maxLength={160} placeholder={site.heroBody} onChange={(event) => updateSite("seoDescription", event.target.value)} /></label></section>
         </div>}
         {error && <p className="form-error" role="alert">{error}</p>}
         {saved && <p className="form-success" role="status">Alterações salvas.</p>}

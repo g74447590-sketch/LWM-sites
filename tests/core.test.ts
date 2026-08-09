@@ -52,6 +52,11 @@ describe("modelos de sites", () => {
     expect(parseGeneratedSite({ ...site, sections }).sections[0].imageUrl).toBe("https://cdn.example.com/foto.webp");
     expect(() => parseGeneratedSite({ ...site, sections: [{ ...site.sections[0], imageUrl: "http://example.com/foto.jpg" }] })).toThrow();
   });
+  it("limita metadados de busca para não gerar páginas inválidas", () => {
+    const site = createTemplateSite({ templateId: "services", businessName: "Oficina Norte", locale: "pt-BR" });
+    expect(parseGeneratedSite({ ...site, seoTitle: "Oficina Norte | Serviços", seoDescription: "Soluções profissionais para a sua empresa." }).seoTitle).toContain("Oficina Norte");
+    expect(() => parseGeneratedSite({ ...site, seoTitle: "x".repeat(61) })).toThrow();
+  });
 });
 
 describe("validação de entrada", () => {
