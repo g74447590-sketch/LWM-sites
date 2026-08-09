@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { isAppError, AppError } from "@/lib/errors";
-import { getActivePlanAccess, getProject } from "@/lib/projects";
+import { getProject } from "@/lib/projects";
 import { enforceRequestRateLimit } from "@/lib/rate-limit";
 import { requireUserId } from "@/lib/session";
 import { getServerSupabase } from "@/lib/supabase";
@@ -21,7 +21,7 @@ export async function POST(request: Request, { params }: Context) {
     const { projectId } = await params;
     const userId = await requireUserId();
     await enforceRequestRateLimit(request, `media-upload:${userId}`, 20, 60 * 60);
-    await Promise.all([getProject(userId, projectId), getActivePlanAccess(userId)]);
+    await getProject(userId, projectId);
 
     const formData = await request.formData();
     const file = formData.get("file");

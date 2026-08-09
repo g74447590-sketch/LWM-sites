@@ -1,5 +1,5 @@
 /* =========================================================================
-   LWM Sites Ã¢â‚¬â€ Design System
+   LWM Sites â€” Design System
    Apple-inspired: light surfaces, SF-style type, restrained blue accent,
    generous whitespace, pill buttons, soft shadows instead of heavy glows.
    ========================================================================= */
@@ -194,7 +194,7 @@ footer { padding: 28px 32px; text-align: center; color: var(--muted); border-top
 .editor-preview-link { display: inline-flex; margin-top: 13px; color: var(--accent); font-size: 13px; font-weight: 600; }
 .editor-preview-link:hover { color: var(--accent-hover); }
 
-/* ---------- Generated site preview (user's published site Ã¢â‚¬â€ keeps its own theme vars) ---------- */
+/* ---------- Generated site preview (user's published site â€” keeps its own theme vars) ---------- */
 .generated-site { min-height: 640px; color: #17141e; background: #fff; font-family: Georgia, serif; }
 .generated-site header { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 21px 7%; font-family: -apple-system, Arial, sans-serif; font-size: 12px; }
 .generated-site header b { color: var(--site-primary); font-size: 18px; }
@@ -376,7 +376,7 @@ footer { padding: 28px 32px; text-align: center; color: var(--muted); border-top
   .mobile-menu nav a:hover { background: var(--bg-alt); }
 }
 
-/* ---------- Commercial pages: pricing teaser + plans ---------- */
+/* ---------- Beta page ---------- */
 .pricing-teaser { max-width: 1176px; margin: 0 auto; padding: 38px; display: flex; align-items: center; justify-content: space-between; gap: 32px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--bg-alt); }
 .pricing-teaser h2 { max-width: 690px; margin: 0; font-size: clamp(26px, 3.6vw, 42px); letter-spacing: -.03em; font-weight: 600; }
 .pricing-teaser p:not(.eyebrow) { max-width: 650px; margin: 12px 0 0; color: var(--muted); line-height: 1.55; }
@@ -494,5 +494,3 @@ footer { padding: 28px 32px; text-align: center; color: var(--muted); border-top
   .pricing-card { padding: 24px; }
   .pricing-explainer, .comparison, .pricing-faq { padding-top: 76px; padding-bottom: 80px; }
 }
-
-

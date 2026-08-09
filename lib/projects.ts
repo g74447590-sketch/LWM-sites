@@ -1,9 +1,8 @@
 import type { GeneratedSite, Project, ProjectMessage, ProjectStatus } from "@/types";
 import { AppError } from "@/lib/errors";
-import { subscriptionAccess } from "@/lib/plans";
+import { freeBetaAccess } from "@/lib/access";
 import { parseGeneratedSite } from "@/lib/site-schema";
 import { getServerSupabase } from "@/lib/supabase";
-import { getUserSubscription } from "@/lib/users";
 
 type ProjectRow = {
   id: string;
@@ -32,17 +31,12 @@ function mapProject(row: ProjectRow): Project {
     updatedAt: row.updated_at,
   };
 }
-
-export async function getActivePlanAccess(userId: string) {
-  const access = subscriptionAccess(await getUserSubscription(userId));
-  if (!access.active) throw new AppError("Seu teste ou plano terminou. Ative um plano para continuar editando e mantendo seu site publicado.", 402, "PLAN_EXPIRED");
-  return access;
-}
-
 async function assertCanCreateProject(userId: string) {
-  const [access, projectCount] = await Promise.all([getActivePlanAccess(userId), getServerSupabase().from("projects").select("id", { count: "exact", head: true }).eq("user_id", userId)]);
+  const projectCount = await getServerSupabase().from("projects").select("id", { count: "exact", head: true }).eq("user_id", userId);
   if (projectCount.error) throw databaseError(projectCount.error.message);
-  if ((projectCount.count ?? 0) >= access.maxProjects) throw new AppError(`O plano ${access.plan.name} permite até ${access.maxProjects} site${access.maxProjects === 1 ? "" : "s"}. Escolha outro plano para criar mais projetos.`, 409, "PLAN_PROJECT_LIMIT");
+  if ((projectCount.count ?? 0) >= freeBetaAccess.maxProjects) {
+    throw new AppError(`A ${freeBetaAccess.label.toLowerCase()} permite até ${freeBetaAccess.maxProjects} projetos por conta para manter o serviço estável.`, 409, "BETA_PROJECT_LIMIT");
+  }
 }
 
 function databaseError(message: string): AppError {
@@ -83,7 +77,6 @@ export async function createProject(userId: string, name: string, description: s
 }
 
 export async function updateProjectName(userId: string, projectId: string, name: string): Promise<Project> {
-  await getActivePlanAccess(userId);
   const { data, error } = await getServerSupabase()
     .from("projects")
     .update({ name })
@@ -101,7 +94,6 @@ export async function saveGeneratedSite(
   projectId: string,
   generatedSite: GeneratedSite,
 ): Promise<Project> {
-  await getActivePlanAccess(userId);
   const { data, error } = await getServerSupabase()
     .from("projects")
     .update({ generated_site: generatedSite, status: "ready" })
@@ -172,7 +164,6 @@ function slugFrom(name: string, projectId: string) {
 }
 
 export async function publishProject(userId: string, projectId: string): Promise<Project> {
-  await getActivePlanAccess(userId);
   const source = await getProject(userId, projectId);
   if (!source.generatedSite) throw new AppError("Gere um site antes de publicá-lo.", 409, "PROJECT_NOT_GENERATED");
   const { data, error } = await getServerSupabase()
@@ -209,8 +200,7 @@ export async function getPublishedProject(slug: string): Promise<Project | null>
     .maybeSingle();
   if (error) throw databaseError(error.message);
   if (!data) return null;
-  const project = mapProject(data as ProjectRow);
-  return subscriptionAccess(await getUserSubscription(project.userId)).active ? project : null;
+  return mapProject(data as ProjectRow);
 }
 
 type ProjectMessageRow = {

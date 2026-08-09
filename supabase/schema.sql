@@ -14,8 +14,6 @@ create table if not exists public.users (
   name text not null check (char_length(name) between 2 and 80),
   email text not null unique check (email = lower(email)),
   password_hash text not null,
-  plan_key text not null default 'trial' check (plan_key in ('trial', 'launch', 'essential', 'professional')),
-  plan_expires_at timestamptz not null default (now() + interval '7 days'),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -39,21 +37,6 @@ create index if not exists projects_user_updated_idx on public.projects (user_id
 alter table public.projects add column if not exists slug text;
 alter table public.projects add column if not exists published_at timestamptz;
 create unique index if not exists projects_slug_unique_idx on public.projects (slug) where slug is not null;
-
--- Commercial access. New accounts start with a real seven-day trial; an active
--- subscription is required to create, edit, upload media, or serve a site.
-alter table public.users add column if not exists plan_key text;
-alter table public.users add column if not exists plan_expires_at timestamptz;
-update public.users set plan_key = 'trial' where plan_key is null;
-update public.users set plan_expires_at = now() + interval '7 days' where plan_expires_at is null;
-alter table public.users alter column plan_key set default 'trial';
-alter table public.users alter column plan_key set not null;
-alter table public.users alter column plan_expires_at set not null;
-do $$ begin
-  if not exists (select 1 from pg_constraint where conname = 'users_plan_key_check' and conrelid = 'public.users'::regclass) then
-    alter table public.users add constraint users_plan_key_check check (plan_key in ('trial', 'launch', 'essential', 'professional'));
-  end if;
-end $$;
 
 create table if not exists public.project_messages (
   id uuid primary key default gen_random_uuid(),
