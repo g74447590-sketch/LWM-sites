@@ -342,6 +342,10 @@ footer { padding: 28px 32px; text-align: center; color: var(--muted); border-top
 .style-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
 .style-options button { min-height: 42px; padding: 6px; border: 1px solid var(--line); background: #fff; font-size: 11px; }
 .editor-shortcut { margin: -12px 0 0; color: var(--muted); font-size: 11px; text-align: center; }
+.editor-save-publish { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 8px; }
+.editor-save-publish .button { width: 100%; min-height: 44px; }
+.editor-published-link { margin-top: -8px; color: var(--accent); font-size: 12px; font-weight: 600; text-align: center; }
+.editor-published-link:hover { color: var(--accent-hover); }
 .editor-history { display: flex; gap: 7px; }
 .editor-history button { flex: 1; min-height: 36px; border: 1px solid var(--line); border-radius: 8px; color: var(--text); background: #fff; font-size: 12px; font-weight: 600; }
 .editor-history button:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-tint); }

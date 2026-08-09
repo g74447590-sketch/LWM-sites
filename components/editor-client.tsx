@@ -41,8 +41,11 @@ export function EditorClient({ project }: { project: Project }) {
   const [device, setDevice] = useState<Device>("desktop");
   const [panel, setPanel] = useState<EditorPanel>("content");
   const [busy, setBusy] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(true);
+  const [publishedSlug, setPublishedSlug] = useState(project.slug);
+  const [publishedAt, setPublishedAt] = useState(project.publishedAt);
   const [uploadingSectionId, setUploadingSectionId] = useState<string | null>(null);
   const siteRef = useRef<GeneratedSite | null>(project.generatedSite);
   const historyRef = useRef<GeneratedSite[]>(project.generatedSite ? [project.generatedSite] : []);
@@ -187,21 +190,48 @@ export function EditorClient({ project }: { project: Project }) {
     }
   }
 
+  async function persistSite(currentSite: GeneratedSite): Promise<Project> {
+    const response = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ site: currentSite }) });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "Não foi possível salvar o site.");
+    const updated = payload as Project;
+    siteRef.current = updated.generatedSite;
+    setSite(updated.generatedSite);
+    setSaved(true);
+    return updated;
+  }
+
   async function saveSite() {
-    if (!site || busy) return;
+    const currentSite = siteRef.current;
+    if (!currentSite || busy || publishing) return;
     setBusy(true);
     setError(null);
     try {
-      const response = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ site }) });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Não foi possível salvar o site.");
-      siteRef.current = payload.generatedSite;
-      setSite(payload.generatedSite);
-      setSaved(true);
+      await persistSite(currentSite);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Não foi possível salvar o site.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function publishSite() {
+    const currentSite = siteRef.current;
+    if (!currentSite || busy || publishing) return;
+    setPublishing(true);
+    setError(null);
+    try {
+      if (!saved) await persistSite(currentSite);
+      const response = await fetch(`/api/projects/${project.id}/publish`, { method: "POST" });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Não foi possível publicar o site.");
+      const updated = payload as Project;
+      setPublishedSlug(updated.slug);
+      setPublishedAt(updated.publishedAt);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Não foi possível publicar o site.");
+    } finally {
+      setPublishing(false);
     }
   }
 
@@ -287,8 +317,12 @@ export function EditorClient({ project }: { project: Project }) {
           <section className="editor-group"><h2>SEO e compartilhamento</h2><p className="editor-helper">Título e descrição usados pelo Google e ao compartilhar o link.</p><label>Título SEO <small>(até 60 caracteres)</small><input value={site.seoTitle ?? ""} maxLength={60} placeholder={site.businessName} onChange={(event) => updateSite("seoTitle", event.target.value)} /></label><label>Descrição SEO <small>(até 160 caracteres)</small><textarea value={site.seoDescription ?? ""} maxLength={160} placeholder={site.heroBody} onChange={(event) => updateSite("seoDescription", event.target.value)} /></label></section>
         </div>}
         {error && <p className="form-error" role="alert">{error}</p>}
-        {saved && <p className="form-success" role="status">Alterações salvas.</p>}
-        <button className="button button-primary" disabled={busy} onClick={() => void saveSite()}>{busy ? "Salvando..." : "Salvar alterações"}</button>
+        {saved && <p className="form-success" role="status">{publishedAt ? "Site salvo e publicado." : "Alterações salvas."}</p>}
+        <div className="editor-save-publish">
+          <button className="button button-ghost" disabled={busy || publishing} onClick={() => void saveSite()}>{busy ? "Salvando..." : "Salvar rascunho"}</button>
+          <button className="button button-primary" disabled={busy || publishing} onClick={() => void publishSite()}>{publishing ? "Publicando..." : publishedAt ? "Salvar e atualizar site" : "Salvar e publicar"}</button>
+        </div>
+        {publishedSlug && publishedAt && <a className="editor-published-link" href={`/sites/${publishedSlug}`} target="_blank" rel="noreferrer">Abrir site publicado ↗</a>}
         <p className="editor-shortcut">Atalho: Ctrl/Cmd + S para salvar.</p>
       </> : <div className="editor-empty"><p>Este projeto antigo não tem modelo. Crie um novo site usando um dos modelos disponíveis.</p></div>}
     </aside>
