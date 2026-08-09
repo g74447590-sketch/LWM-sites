@@ -124,12 +124,21 @@ export async function markGenerationError(userId: string, projectId: string): Pr
 }
 
 export async function deleteProject(userId: string, projectId: string): Promise<void> {
-  const { error } = await getServerSupabase()
+  const supabase = getServerSupabase();
+  const { error } = await supabase
     .from("projects")
     .delete()
     .eq("id", projectId)
     .eq("user_id", userId);
   if (error) throw databaseError(error.message);
+
+  // Storage is not deleted by the database cascade. Clean up project media after
+  // the ownership-scoped database deletion succeeds; failures here stay best-effort.
+  const mediaFolder = `projects/${projectId}`;
+  const { data: mediaFiles } = await supabase.storage.from("site-media").list(mediaFolder, { limit: 1000 });
+  if (mediaFiles?.length) {
+    await supabase.storage.from("site-media").remove(mediaFiles.map((file) => `${mediaFolder}/${file.name}`));
+  }
 }
 
 export async function duplicateProject(userId: string, projectId: string): Promise<Project> {

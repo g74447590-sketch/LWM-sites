@@ -41,15 +41,6 @@ export function PwaInstallPrompt() {
     };
   }, []);
 
-  if (!prompt) return null;
-  const installPrompt = prompt;
-
-  async function install() {
-    await installPrompt.prompt();
-    await installPrompt.userChoice;
-    setPrompt(null);
-  }
-
   function dismissAppleInstructions() {
     sessionStorage.setItem("lwm-sites-ios-install-dismissed", "true");
     setShowAppleInstructions(false);
@@ -60,6 +51,15 @@ export function PwaInstallPrompt() {
       <div><b>Use como aplicativo</b><span>No iPhone ou iPad, toque em Compartilhar e depois em “Adicionar à Tela de Início”.</span></div>
       <button className="pwa-dismiss" type="button" onClick={dismissAppleInstructions} aria-label="Fechar instruções de instalação">Agora não</button>
     </aside>;
+  }
+
+  if (!prompt) return null;
+  const installPrompt = prompt;
+
+  async function install() {
+    await installPrompt.prompt();
+    await installPrompt.userChoice;
+    setPrompt(null);
   }
 
   return <aside className="pwa-install" aria-label="Instalar aplicativo">
