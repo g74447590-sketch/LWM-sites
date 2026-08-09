@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { renderToStaticMarkup } from "react-dom/server";
+import { SitePreview } from "@/components/site-preview";
 import { detectLocale, detectPromptLocale } from "@/lib/locale";
 import { parseGeneratedSite } from "@/lib/site-schema";
 import { createTemplateSite, siteTemplates } from "@/lib/site-templates";
@@ -38,6 +40,18 @@ describe("modelos de sites", () => {
     expect(parseGeneratedSite({ ...site, fontFamily: "display", heroStyle: "split", contentStyle: "outlined", buttonStyle: "pill" }).buttonStyle).toBe("pill");
     expect(() => parseGeneratedSite({ ...site, heroStyle: "imagem-insegura" })).toThrow();
   });
+  it("valida blocos, layouts e visibilidade do editor visual", () => {
+    const site = createTemplateSite({ templateId: "services", businessName: "Oficina Norte", locale: "pt-BR" });
+    const sections = site.sections.map((section, index) => index === 0 ? { ...section, layout: "faq" as const, hidden: true } : section);
+    expect(parseGeneratedSite({ ...site, sections }).sections[0]).toMatchObject({ layout: "faq", hidden: true });
+    expect(() => parseGeneratedSite({ ...site, sections: [{ ...site.sections[0], layout: "slider" }] })).toThrow();
+  });
+  it("aceita somente URLs HTTPS para imagens publicadas", () => {
+    const site = createTemplateSite({ templateId: "services", businessName: "Oficina Norte", locale: "pt-BR" });
+    const sections = [{ ...site.sections[0], imageUrl: "https://cdn.example.com/foto.webp" }];
+    expect(parseGeneratedSite({ ...site, sections }).sections[0].imageUrl).toBe("https://cdn.example.com/foto.webp");
+    expect(() => parseGeneratedSite({ ...site, sections: [{ ...site.sections[0], imageUrl: "http://example.com/foto.jpg" }] })).toThrow();
+  });
 });
 
 describe("validação de entrada", () => {
@@ -51,5 +65,22 @@ describe("validação de entrada", () => {
   it("exige modelo, nome e contexto mínimo para criar um site", () => {
     expect(siteProjectSchema.safeParse({ description: "curto", businessName: "A", templateId: "services" }).success).toBe(false);
     expect(siteProjectSchema.safeParse({ description: "Atendimento residencial para empresas e famílias.", businessName: "Serviços Norte", templateId: "services" }).success).toBe(true);
+  });
+});
+
+describe("preview do site", () => {
+  it("renderiza navegação e FAQ, mas não mostra blocos ocultos", () => {
+    const site = createTemplateSite({ templateId: "restaurant", businessName: "Café Central", locale: "pt-BR" });
+    const withLayouts = {
+      ...site,
+      sections: [
+        { ...site.sections[0], id: "perguntas", title: "Dúvidas", layout: "faq" as const },
+        { ...site.sections[1], id: "oculto", title: "Bloco oculto", hidden: true },
+      ],
+    };
+    const html = renderToStaticMarkup(SitePreview({ site: withLayouts }));
+    expect(html).toContain('href="#perguntas"');
+    expect(html).toContain("<details>");
+    expect(html).not.toContain("Bloco oculto");
   });
 });

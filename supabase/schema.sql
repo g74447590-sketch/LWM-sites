@@ -3,6 +3,12 @@
 
 create extension if not exists pgcrypto;
 
+-- Media uploaded through the authenticated server route. Files are publicly readable
+-- only after the application stores their safe HTTPS URL in a published site.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('site-media', 'site-media', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+on conflict (id) do update set public = true, file_size_limit = 5242880, allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
 create table if not exists public.users (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 2 and 80),

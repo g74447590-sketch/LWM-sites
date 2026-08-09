@@ -3,6 +3,7 @@ import { siteTemplateIds, type GeneratedSite } from "@/types";
 
 const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Use a cor hexadecimal #RRGGBB.");
 const safeHref = z.string().trim().max(500).refine((value) => value === "#contato" || /^(https?:\/\/|mailto:|tel:)/i.test(value), "Use um link seguro.");
+const safeImageUrl = z.string().trim().max(1000).url().refine((value) => /^https:\/\//i.test(value), "Use uma imagem HTTPS segura.");
 
 export const generatedSiteSchema = z.object({
   language: z.enum(["pt-BR", "en", "es"]),
@@ -25,6 +26,9 @@ export const generatedSiteSchema = z.object({
         id: z.string().regex(/^[a-z0-9-]+$/).max(40),
         title: z.string().trim().min(1).max(80),
         body: z.string().trim().min(1).max(240),
+        layout: z.enum(["cards", "list", "banner", "faq"]).optional(),
+        hidden: z.boolean().optional(),
+        imageUrl: safeImageUrl.optional(),
         items: z.array(
           z.object({
             title: z.string().trim().min(1).max(80),

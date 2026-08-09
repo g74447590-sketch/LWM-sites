@@ -8,6 +8,7 @@ export type SiteFont = "sans" | "serif" | "display";
 export type HeroStyle = "gradient" | "solid" | "split";
 export type ContentStyle = "cards" | "minimal" | "outlined";
 export type ButtonStyle = "rounded" | "square" | "pill";
+export type SectionLayout = "cards" | "list" | "banner" | "faq";
 
 export type GeneratedSite = {
   language: Locale;
@@ -28,6 +29,9 @@ export type GeneratedSite = {
     id: string;
     title: string;
     body: string;
+    layout?: SectionLayout;
+    hidden?: boolean;
+    imageUrl?: string;
     items: Array<{ title: string; description: string; price?: string }>;
   }>;
 };
