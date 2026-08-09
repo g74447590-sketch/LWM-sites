@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "node:crypto";
 import { AppError } from "@/lib/errors";
+import { isPlanKey, type Subscription } from "@/lib/plans";
 import { getServerSupabase } from "@/lib/supabase";
 
 type UserRow = {
@@ -8,6 +9,8 @@ type UserRow = {
   name: string;
   email: string;
   password_hash: string;
+  plan_key: string;
+  plan_expires_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -27,8 +30,8 @@ export async function createUser(input: { name: string; email: string; password:
   const passwordHash = await bcrypt.hash(input.password, 12);
   const { data, error } = await getServerSupabase()
     .from("users")
-    .insert({ name: input.name.trim(), email, password_hash: passwordHash })
-    .select("id, name, email, password_hash, created_at, updated_at")
+    .insert({ name: input.name.trim(), email, password_hash: passwordHash, plan_key: "trial", plan_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() })
+    .select("id, name, email, password_hash, plan_key, plan_expires_at, created_at, updated_at")
     .single();
   if (error?.code === "23505") {
     throw new AppError("Este email já está cadastrado.", 409, "EMAIL_ALREADY_EXISTS");
@@ -57,6 +60,14 @@ export async function findUserByEmail(email: string) {
     .maybeSingle();
   if (error) throw userError(error.message);
   return data as Pick<UserRow, "id" | "email"> | null;
+}
+
+export async function getUserSubscription(userId: string): Promise<Subscription> {
+  const { data, error } = await getServerSupabase().from("users").select("plan_key, plan_expires_at").eq("id", userId).maybeSingle();
+  if (error) throw userError(error.message);
+  if (!data) throw new AppError("Conta não encontrada.", 404, "USER_NOT_FOUND");
+  const user = data as Pick<UserRow, "plan_key" | "plan_expires_at">;
+  return { planKey: isPlanKey(user.plan_key) ? user.plan_key : "trial", expiresAt: user.plan_expires_at };
 }
 
 function tokenHash(token: string) {

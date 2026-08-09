@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 import { Logo } from "@/components/site-header";
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const isRegister = mode === "register";
+  const requestedCallbackUrl = searchParams.get("callbackUrl");
+  const callbackUrl = requestedCallbackUrl?.startsWith("/") && !requestedCallbackUrl.startsWith("//") ? requestedCallbackUrl : "/dashboard";
+  const alternateAuthUrl = `${isRegister ? "/login" : "/register"}?callbackUrl=${encodeURIComponent(callbackUrl)}`;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,7 +31,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       }
       const result = await signIn("credentials", { email, password, redirect: false });
       if (result?.error) throw new Error("Email ou senha incorretos, ou a autenticação ainda não foi configurada.");
-      router.push("/dashboard");
+      router.push(callbackUrl);
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Não foi possível continuar.");
@@ -46,6 +50,6 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       <button disabled={busy} className="button button-primary" type="submit">{busy ? "Aguarde..." : isRegister ? "Criar conta" : "Entrar"}</button>
     </form>
     {!isRegister && <p className="auth-switch"><Link href="/forgot-password">Esqueci minha senha</Link></p>}
-    <p className="auth-switch">{isRegister ? "Já tem uma conta?" : "Ainda não tem uma conta?"} <Link href={isRegister ? "/login" : "/register"}>{isRegister ? "Entrar" : "Criar conta"}</Link></p>
+    <p className="auth-switch">{isRegister ? "Já tem uma conta?" : "Ainda não tem uma conta?"} <Link href={alternateAuthUrl}>{isRegister ? "Entrar" : "Criar conta"}</Link></p>
   </div></main>;
 }

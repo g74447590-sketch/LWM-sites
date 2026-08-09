@@ -1,6 +1,7 @@
 export const supportedLocales = ["pt-BR", "en", "es"] as const;
 
 export type Locale = (typeof supportedLocales)[number];
+export type { PlanKey } from "@/lib/plans";
 export type ProjectStatus = "draft" | "generating" | "ready" | "error";
 export const siteTemplateIds = ["barbershop", "beauty", "restaurant", "services"] as const;
 export type SiteTemplateId = (typeof siteTemplateIds)[number];
