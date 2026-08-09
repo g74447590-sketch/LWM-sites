@@ -18,18 +18,25 @@ describe("internacionalização", () => {
 });
 
 describe("modelos de sites", () => {
-  it("cria uma especificação segura e completa para cada modelo", () => {
-    for (const template of siteTemplates) {
-      const site = createTemplateSite({ templateId: template.id, businessName: "Negócio Exemplo", whatsapp: "55 11 99999-9999", locale: "pt-BR" });
+  it("cria uma especificação segura e completa para cada modelo e idioma", () => {
+    for (const locale of ["pt-BR", "en", "es"] as const) for (const template of siteTemplates) {
+      const site = createTemplateSite({ templateId: template.id, businessName: "Negócio Exemplo", whatsapp: "55 11 99999-9999", locale });
       expect(parseGeneratedSite(site)).toEqual(site);
       expect(site.ctaHref).toBe("https://wa.me/5511999999999");
       expect(site.sections.length).toBeGreaterThan(0);
+      expect(site.language).toBe(locale);
     }
   });
   it("usa um link interno seguro quando não há WhatsApp", () => {
     const site = createTemplateSite({ templateId: "services", businessName: "Oficina Norte", locale: "pt-BR" });
     expect(site.ctaHref).toBe("#contato");
     expect(() => parseGeneratedSite({ ...site, ctaHref: "javascript:alert(1)" })).toThrow();
+    expect(() => parseGeneratedSite({ ...site, ctaHref: "data:text/html,unsafe" })).toThrow();
+  });
+  it("aceita somente opções visuais conhecidas no construtor", () => {
+    const site = createTemplateSite({ templateId: "beauty", businessName: "Estúdio Aurora", locale: "pt-BR" });
+    expect(parseGeneratedSite({ ...site, fontFamily: "display", heroStyle: "split", contentStyle: "outlined", buttonStyle: "pill" }).buttonStyle).toBe("pill");
+    expect(() => parseGeneratedSite({ ...site, heroStyle: "imagem-insegura" })).toThrow();
   });
 });
 

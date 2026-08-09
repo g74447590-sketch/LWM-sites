@@ -4,6 +4,10 @@ export type Locale = (typeof supportedLocales)[number];
 export type ProjectStatus = "draft" | "generating" | "ready" | "error";
 export const siteTemplateIds = ["barbershop", "beauty", "restaurant", "services"] as const;
 export type SiteTemplateId = (typeof siteTemplateIds)[number];
+export type SiteFont = "sans" | "serif" | "display";
+export type HeroStyle = "gradient" | "solid" | "split";
+export type ContentStyle = "cards" | "minimal" | "outlined";
+export type ButtonStyle = "rounded" | "square" | "pill";
 
 export type GeneratedSite = {
   language: Locale;
@@ -16,6 +20,10 @@ export type GeneratedSite = {
   ctaLabel: string;
   ctaHref?: string;
   templateId?: SiteTemplateId;
+  fontFamily?: SiteFont;
+  heroStyle?: HeroStyle;
+  contentStyle?: ContentStyle;
+  buttonStyle?: ButtonStyle;
   sections: Array<{
     id: string;
     title: string;

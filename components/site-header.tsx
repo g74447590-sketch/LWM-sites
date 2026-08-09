@@ -17,6 +17,14 @@ export function SiteHeader({ app = false }: { app?: boolean }) {
         {!app && <><a href="#produto">{t.nav.product}</a><a href="#como-funciona">{t.nav.how}</a></>}
         {app && <Link href="/dashboard">{t.nav.projects}</Link>}
       </nav>
+      <details className="mobile-menu">
+        <summary aria-label="Abrir menu"><span aria-hidden="true">☰</span><span className="sr-only">Abrir menu</span></summary>
+        <nav aria-label="Navegação móvel">
+          {!app && <><a href="#produto">{t.nav.product}</a><a href="#como-funciona">{t.nav.how}</a></>}
+          {app && <Link href="/dashboard">{t.nav.projects}</Link>}
+          <Link href="/create">{t.nav.start}</Link>
+        </nav>
+      </details>
       <div className="header-actions">
         <LanguagePicker />
         <Link className="button button-ghost" href="/login">{t.nav.login}</Link>

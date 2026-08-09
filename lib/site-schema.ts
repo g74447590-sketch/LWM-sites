@@ -15,6 +15,10 @@ export const generatedSiteSchema = z.object({
   ctaLabel: z.string().trim().min(1).max(40),
   ctaHref: safeHref.optional(),
   templateId: z.enum(siteTemplateIds).optional(),
+  fontFamily: z.enum(["sans", "serif", "display"]).optional(),
+  heroStyle: z.enum(["gradient", "solid", "split"]).optional(),
+  contentStyle: z.enum(["cards", "minimal", "outlined"]).optional(),
+  buttonStyle: z.enum(["rounded", "square", "pill"]).optional(),
   sections: z
     .array(
       z.object({
