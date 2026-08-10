@@ -1,4 +1,4 @@
-import { CreateProjectForm } from "@/components/create-project-form";
+import { SiteRequestStart } from "@/components/site-request-start";
 import { SiteHeader } from "@/components/site-header";
 
-export default function CreatePage() { return <><SiteHeader app /><main className="centered-page"><CreateProjectForm /></main></>; }
+export default function CreatePage() { return <><SiteHeader app /><main className="onboarding-page"><SiteRequestStart /></main></>; }
