@@ -16,7 +16,7 @@ export function LandingPage() {
       <section className="benefits" aria-label="Benefícios">{t.benefits.map((benefit) => <article key={benefit}><span>✦</span>{benefit}</article>)}</section>
       <section className="pricing-teaser" aria-labelledby="pricing-teaser-title"><div><p className="eyebrow">BETA GRATUITA</p><h2 id="pricing-teaser-title">Crie e publique sites sem cobrança durante a beta.</h2><p>Use o editor visual, imagens, WhatsApp, SEO e preview responsivo. Sem IA paga, cartão ou assinatura.</p></div><Link href="/planos" className="button button-ghost">Entender a beta</Link></section>
       <section className="how" id="como-funciona"><p className="eyebrow">LWM FLOW</p><h2>{t.howTitle}</h2><div className="steps">{t.steps.map((step, index) => <article key={step}><b>0{index + 1}</b><p>{step}</p></article>)}</div></section>
-      <section className="closing"><p className="eyebrow">PRONTO PARA COMEÇAR?</p><h2>Build without code.</h2><Link href="/create" className="button button-primary">{t.nav.start}</Link></section>
+      <section className="closing"><p className="eyebrow">PRONTO PARA COMEÇAR?</p><h2>{t.hero.title}</h2><Link href="/create" className="button button-primary">{t.nav.start}</Link></section>
     </main>
     <footer>{t.footer}</footer>
   </>;

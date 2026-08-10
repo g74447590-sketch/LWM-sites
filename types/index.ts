@@ -2,8 +2,10 @@ export const supportedLocales = ["pt-BR", "en", "es"] as const;
 
 export type Locale = (typeof supportedLocales)[number];
 export type ProjectStatus = "draft" | "generating" | "ready" | "error";
-export const siteTemplateIds = ["barbershop", "beauty", "restaurant", "services"] as const;
+export const siteTemplateIds = ["creator", "store", "barbershop", "beauty", "restaurant", "services"] as const;
 export type SiteTemplateId = (typeof siteTemplateIds)[number];
+export const sitePurposes = ["personal", "business"] as const;
+export type SitePurpose = (typeof sitePurposes)[number];
 export type SiteFont = "sans" | "serif" | "display";
 export type HeroStyle = "gradient" | "solid" | "split";
 export type ContentStyle = "cards" | "minimal" | "outlined";

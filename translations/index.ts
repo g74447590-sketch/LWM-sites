@@ -4,12 +4,12 @@ const messages = {
   "pt-BR": {
     nav: { product: "Produto", how: "Como funciona", projects: "Meus projetos", login: "Entrar", start: "Criar meu site" },
     hero: { eyebrow: "SITES SEM CÓDIGO", title: "Seu site profissional. Do seu jeito.", body: "Escolha um modelo, personalize cada detalhe e publique sem precisar programar.", primary: "Criar meu site", secondary: "Ver como funciona" },
-    benefits: ["Modelos prontos", "Sem programação", "Edição visual", "Preview responsivo", "Botão de WhatsApp", "Projetos salvos"],
+    benefits: ["Modelos prontos", "Sem programação", "Edição visual", "Visualização responsiva", "Botão de WhatsApp", "Projetos salvos"],
     howTitle: "Do modelo ao site publicado, sem complicação.",
-    steps: ["Escolha um modelo para o seu negócio.", "Personalize textos, cores e contatos.", "Revise em desktop, tablet e celular.", "Publique e compartilhe seu link."],
+    steps: ["Escolha um modelo para você ou para um negócio.", "Personalize textos, cores, imagens e contatos.", "Revise em computador, tablet e celular.", "Publique e compartilhe seu link."],
     footer: "LWM SITES — SITES SEM CÓDIGO",
-    create: { title: "Crie seu site", subtitle: "Escolha uma base profissional e personalize para o seu negócio.", placeholder: "Conte em poucas palavras o que seu negócio oferece, para quem e qual é o seu diferencial.", button: "Criar site", loading: "Criando site..." },
-    editor: { preview: "Preview", desktop: "Desktop", tablet: "Tablet", mobile: "Celular" },
+    create: { title: "Crie seu site", subtitle: "Escolha uma base pronta e personalize para você ou para um negócio.", placeholder: "Conte em poucas palavras o que o site deve mostrar e para quem ele foi feito.", button: "Criar site", loading: "Criando site..." },
+    editor: { preview: "Visualização", desktop: "Computador", tablet: "Tablet", mobile: "Celular" },
   },
   en: {
     nav: { product: "Product", how: "How it works", projects: "My projects", login: "Log in", start: "Create my site" },

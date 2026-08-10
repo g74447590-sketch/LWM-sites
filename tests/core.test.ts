@@ -4,7 +4,7 @@ import { SitePreview } from "@/components/site-preview";
 import { detectLocale, detectPromptLocale } from "@/lib/locale";
 import { parseGeneratedSite } from "@/lib/site-schema";
 import { createTemplateSite, siteTemplates } from "@/lib/site-templates";
-import { passwordSchema, registerSchema, siteProjectSchema } from "@/lib/validation";
+import { passwordSchema, publishProjectSchema, registerSchema, siteProjectSchema } from "@/lib/validation";
 
 describe("internacionalização", () => {
   it("prioriza português, espanhol e inglês como fallback", () => {
@@ -70,6 +70,11 @@ describe("validação de entrada", () => {
   it("exige modelo, nome e contexto mínimo para criar um site", () => {
     expect(siteProjectSchema.safeParse({ description: "curto", businessName: "A", templateId: "services" }).success).toBe(false);
     expect(siteProjectSchema.safeParse({ description: "Atendimento residencial para empresas e famílias.", businessName: "Serviços Norte", templateId: "services" }).success).toBe(true);
+    expect(siteProjectSchema.safeParse({ description: "Meu portfólio de ilustrações e projetos pessoais.", businessName: "Ana Cria", templateId: "creator" }).success).toBe(true);
+  });
+  it("exige a confirmação de direito de uso antes de publicar", () => {
+    expect(publishProjectSchema.safeParse({ acknowledge: false }).success).toBe(false);
+    expect(publishProjectSchema.safeParse({ acknowledge: true }).success).toBe(true);
   });
 });
 

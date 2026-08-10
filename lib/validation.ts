@@ -20,5 +20,8 @@ export const siteProjectSchema = z.object({
 
 export const updateProjectSchema = z.object({ name: z.string().trim().min(1).max(100).optional() });
 export const saveSiteSchema = z.object({ site: generatedSiteSchema });
+export const publishProjectSchema = z.object({
+  acknowledge: z.boolean().refine((value) => value, "Confirme que você tem direito de publicar este conteúdo."),
+});
 export const passwordResetRequestSchema = z.object({ email: z.string().trim().email("Informe um email válido.").max(254) });
 export const passwordResetConfirmSchema = z.object({ token: z.string().length(64, "Link de recuperação inválido."), password: passwordSchema, confirmPassword: z.string() }).refine((data) => data.password === data.confirmPassword, { message: "As senhas não coincidem.", path: ["confirmPassword"] });

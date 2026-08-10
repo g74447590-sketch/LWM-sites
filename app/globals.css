@@ -204,6 +204,12 @@ footer { padding: 28px 32px; text-align: center; color: var(--muted); border-top
 .onboarding-description { max-width: 600px; margin: 18px 0 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
 .onboarding-form { display: grid; gap: 11px; margin-top: 30px; }
 .onboarding-form > label, .onboarding-form legend { color: var(--text); font-size: 14px; font-weight: 600; }
+.purpose-picker { min-width: 0; margin: 0 0 5px; padding: 0; border: 0; }
+.purpose-picker > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+.purpose-picker button { display: grid; gap: 4px; min-height: 88px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); color: var(--text); background: var(--bg-alt); text-align: left; }
+.purpose-picker button:hover, .purpose-picker button.selected { border-color: var(--accent); background: var(--accent-tint); }
+.purpose-picker button b { font-size: 14px; }
+.purpose-picker button small { color: var(--muted); font-size: 12px; line-height: 1.35; }
 .onboarding-form textarea { width: 100%; min-height: 150px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); outline: none; resize: vertical; color: var(--text); background: var(--bg-alt); line-height: 1.5; }
 .onboarding-form textarea:focus { border-color: var(--accent); background: var(--panel); box-shadow: 0 0 0 4px var(--accent-tint); }
 .field-helper { margin: -3px 0 3px; color: var(--muted); font-size: 12px; }
@@ -392,6 +398,11 @@ footer { padding: 28px 32px; text-align: center; color: var(--muted); border-top
 .editor-save-publish .button { width: 100%; min-height: 44px; }
 .editor-published-link { margin-top: -8px; color: var(--accent); font-size: 12px; font-weight: 600; text-align: center; }
 .editor-published-link:hover { color: var(--accent-hover); }
+.publish-info { display: grid; gap: 7px; padding: 13px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-alt); }
+.publish-info > b { color: var(--text); font-size: 13px; }
+.publish-info > p, .publish-info > small { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.publication-acknowledgement { display: flex; align-items: flex-start; gap: 9px; color: var(--text); font-size: 12px; line-height: 1.4; cursor: pointer; }
+.publication-acknowledgement input { width: 16px; min-width: 16px; min-height: 16px; margin: 1px 0 0; accent-color: var(--accent); }
 .editor-history { display: flex; gap: 7px; }
 .editor-history button { flex: 1; min-height: 36px; border: 1px solid var(--line); border-radius: 8px; color: var(--text); background: var(--panel); font-size: 12px; font-weight: 600; }
 .editor-history button:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-tint); }
@@ -524,6 +535,7 @@ footer { padding: 28px 32px; text-align: center; color: var(--muted); border-top
   .onboarding-page { min-height: calc(100vh - 70px); padding: 28px 16px 52px; }
   .onboarding-card { padding: 28px 20px; }
   .onboarding-card h1 { font-size: clamp(34px, 11vw, 48px); }
+  .purpose-picker > div { grid-template-columns: 1fr; }
   .onboarding-form .button { width: 100%; }
   .editor-chat { padding: 20px; }
   .preview-toolbar { align-items: flex-start; flex-direction: column; }

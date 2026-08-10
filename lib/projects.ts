@@ -3,6 +3,7 @@ import { AppError } from "@/lib/errors";
 import { freeBetaAccess } from "@/lib/access";
 import { parseGeneratedSite } from "@/lib/site-schema";
 import { getServerSupabase } from "@/lib/supabase";
+import { isTokenBillingEnabled } from "@/lib/credits";
 
 type ProjectRow = {
   id: string;
@@ -166,9 +167,24 @@ function slugFrom(name: string, projectId: string) {
 export async function publishProject(userId: string, projectId: string): Promise<Project> {
   const source = await getProject(userId, projectId);
   if (!source.generatedSite) throw new AppError("Gere um site antes de publicá-lo.", 409, "PROJECT_NOT_GENERATED");
+  const slug = source.slug ?? slugFrom(source.name, source.id);
+  if (isTokenBillingEnabled()) {
+    const { data, error } = await getServerSupabase().rpc("publish_project_with_token", {
+      p_user_id: userId,
+      p_project_id: projectId,
+      p_slug: slug,
+    });
+    if (error?.message.includes("PUBLISH_TOKEN_REQUIRED")) {
+      throw new AppError("Você precisa de 1 token de publicação para colocar este site no ar.", 402, "PUBLISH_TOKEN_REQUIRED");
+    }
+    if (error) throw databaseError(error.message);
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) throw new AppError("Projeto não encontrado.", 404, "PROJECT_NOT_FOUND");
+    return mapProject(row as ProjectRow);
+  }
   const { data, error } = await getServerSupabase()
     .from("projects")
-    .update({ slug: source.slug ?? slugFrom(source.name, source.id), published_at: new Date().toISOString() })
+    .update({ slug, published_at: new Date().toISOString() })
     .eq("id", projectId)
     .eq("user_id", userId)
     .select("*")

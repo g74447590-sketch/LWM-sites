@@ -10,6 +10,7 @@ type EditorPanel = "content" | "blocks" | "design";
 type TextField = "businessName" | "tagline" | "heroTitle" | "heroBody" | "ctaLabel" | "ctaHref" | "primaryColor" | "accentColor" | "seoTitle" | "seoDescription";
 type DesignField = "fontFamily" | "heroStyle" | "contentStyle" | "buttonStyle";
 type SiteSection = GeneratedSite["sections"][number];
+type PublishCreditStatus = { enabled: boolean; publishTokenCost: number; balance: number | null };
 
 const colorPresets = [
   { name: "Violeta", primary: "#4B2A7C", accent: "#E957B5" },
@@ -46,6 +47,8 @@ export function EditorClient({ project }: { project: Project }) {
   const [saved, setSaved] = useState(true);
   const [publishedSlug, setPublishedSlug] = useState(project.slug);
   const [publishedAt, setPublishedAt] = useState(project.publishedAt);
+  const [publishCredits, setPublishCredits] = useState<PublishCreditStatus | null>(null);
+  const [publicationAcknowledged, setPublicationAcknowledged] = useState(false);
   const [uploadingSectionId, setUploadingSectionId] = useState<string | null>(null);
   const siteRef = useRef<GeneratedSite | null>(project.generatedSite);
   const historyRef = useRef<GeneratedSite[]>(project.generatedSite ? [project.generatedSite] : []);
@@ -218,16 +221,24 @@ export function EditorClient({ project }: { project: Project }) {
   async function publishSite() {
     const currentSite = siteRef.current;
     if (!currentSite || busy || publishing) return;
+    if (!publicationAcknowledged) {
+      setError("Antes de publicar, confirme que você tem direito de usar este conteúdo.");
+      return;
+    }
     setPublishing(true);
     setError(null);
     try {
       if (!saved) await persistSite(currentSite);
-      const response = await fetch(`/api/projects/${project.id}/publish`, { method: "POST" });
+      const response = await fetch(`/api/projects/${project.id}/publish`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ acknowledge: true }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Não foi possível publicar o site.");
       const updated = payload as Project;
       setPublishedSlug(updated.slug);
       setPublishedAt(updated.publishedAt);
+      if (publishCredits?.enabled) {
+        const creditResponse = await fetch("/api/credits");
+        if (creditResponse.ok) setPublishCredits(await creditResponse.json() as PublishCreditStatus);
+      }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Não foi possível publicar o site.");
     } finally {
@@ -238,6 +249,15 @@ export function EditorClient({ project }: { project: Project }) {
   useEffect(() => {
     siteRef.current = site;
   }, [site]);
+
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/credits")
+      .then(async (response) => response.ok ? await response.json() as PublishCreditStatus : null)
+      .then((credits) => { if (active && credits) setPublishCredits(credits); })
+      .catch(() => { /* Publishing remains usable when a beta credit check cannot load. */ });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
@@ -318,6 +338,12 @@ export function EditorClient({ project }: { project: Project }) {
         </div>}
         {error && <p className="form-error" role="alert">{error}</p>}
         {saved && <p className="form-success" role="status">{publishedAt ? "Site salvo e publicado." : "Alterações salvas."}</p>}
+        <section className="publish-info" aria-label="Publicação e tokens">
+          <b>{publishCredits?.enabled ? `${publishCredits.balance ?? 0} tokens disponíveis` : "Hospedagem LWM incluída na beta"}</b>
+          <p>{publishCredits?.enabled ? `A primeira publicação de um site usa ${publishCredits.publishTokenCost} token. Atualizações desse mesmo site não consomem outro.` : "A LWM cria o link e hospeda seu site. Você não precisa procurar domínio ou hospedagem para começar."}</p>
+          <label className="publication-acknowledgement"><input type="checkbox" checked={publicationAcknowledged} onChange={(event) => setPublicationAcknowledged(event.target.checked)} /><span>Confirmo que posso usar os textos, imagens, marcas e contatos deste site. Se eu for menor de idade, vou publicar com orientação de um responsável.</span></label>
+          <small>Esta é uma confirmação de conteúdo, não uma aprovação jurídica automática.</small>
+        </section>
         <div className="editor-save-publish">
           <button className="button button-ghost" disabled={busy || publishing} onClick={() => void saveSite()}>{busy ? "Salvando..." : "Salvar rascunho"}</button>
           <button className="button button-primary" disabled={busy || publishing} onClick={() => void publishSite()}>{publishing ? "Publicando..." : publishedAt ? "Salvar e atualizar site" : "Salvar e publicar"}</button>
