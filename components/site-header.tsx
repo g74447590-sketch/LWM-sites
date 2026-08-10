@@ -9,18 +9,22 @@ export function Logo() {
 }
 export function SiteHeader({ app = false }: { app?: boolean }) {
   const { t, locale } = useLocale();
-  const betaLabel = locale === "en" ? "Beta" : locale === "es" ? "Beta" : "Beta grátis";
+  const copy = locale === "en"
+    ? { beta: "Free beta", navigation: "Main navigation", mobileNavigation: "Mobile navigation", openMenu: "Open menu" }
+    : locale === "es"
+      ? { beta: "Beta gratuita", navigation: "Navegación principal", mobileNavigation: "Navegación móvil", openMenu: "Abrir menú" }
+      : { beta: "Beta grátis", navigation: "Navegação principal", mobileNavigation: "Navegação móvel", openMenu: "Abrir menu" };
   return (
     <header className="site-header">
       <Logo />
-      <nav aria-label="Navegação principal">
-        {!app && <><a href="#produto">{t.nav.product}</a><a href="#como-funciona">{t.nav.how}</a><Link href="/planos">{betaLabel}</Link></>}
+      <nav aria-label={copy.navigation}>
+        {!app && <><a href="#produto">{t.nav.product}</a><a href="#como-funciona">{t.nav.how}</a><Link href="/planos">{copy.beta}</Link></>}
         {app && <Link href="/dashboard">{t.nav.projects}</Link>}
       </nav>
       <details className="mobile-menu">
-        <summary aria-label="Abrir menu"><span aria-hidden="true">☰</span><span className="sr-only">Abrir menu</span></summary>
-        <nav aria-label="Navegação móvel">
-          {!app && <><a href="#produto">{t.nav.product}</a><a href="#como-funciona">{t.nav.how}</a><Link href="/planos">{betaLabel}</Link></>}
+        <summary aria-label={copy.openMenu}><span aria-hidden="true">☰</span><span className="sr-only">{copy.openMenu}</span></summary>
+        <nav aria-label={copy.mobileNavigation}>
+          {!app && <><a href="#produto">{t.nav.product}</a><a href="#como-funciona">{t.nav.how}</a><Link href="/planos">{copy.beta}</Link></>}
           {app && <Link href="/dashboard">{t.nav.projects}</Link>}
           <Link href="/create">{t.nav.start}</Link>
         </nav>
