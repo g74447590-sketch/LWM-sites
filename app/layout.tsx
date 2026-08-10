@@ -13,13 +13,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08080b",
-  colorScheme: "dark",
+  themeColor: "#0b0b10",
+  colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pt-BR"><body><LocaleProvider>{children}<PwaInstallPrompt /></LocaleProvider></body></html>;
+  return <html lang="pt-BR" data-theme="dark"><body><LocaleProvider>{children}<PwaInstallPrompt /></LocaleProvider></body></html>;
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { LanguagePicker } from "@/components/language-picker";
 import { useLocale } from "@/components/locale-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Logo() {
   return <Link href="/" className="logo" aria-label="LWM Sites"><span>LWM</span><strong>SITES</strong></Link>;
@@ -30,6 +31,7 @@ export function SiteHeader({ app = false }: { app?: boolean }) {
         </nav>
       </details>
       <div className="header-actions">
+        <ThemeToggle />
         <LanguagePicker />
         <Link className="button button-ghost" href="/login">{t.nav.login}</Link>
         <Link className="button button-primary header-cta" href="/create">{t.nav.start}</Link>
